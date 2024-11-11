@@ -18,18 +18,30 @@ jobs:
       with:
         dotnet-version: '8.0.x'
     
-    - name: List directory contents
+    - name: Show current directory
+      run: pwd
+      
+    - name: List all directories and files (including hidden)
       run: ls -la
       
-    - name: Navigate to solution directory
-      run: |
-        cd PuebaTecnicaBackend405226-Paredes-Esteban/Challenge
-        ls -la
-        
+    - name: List all directories recursively
+      run: find . -type d
+      
+    - name: Find solution file
+      run: find . -name "*.sln"
+      
     - name: Restore dependencies
-      working-directory: ./PuebaTecnicaBackend405226-Paredes-Esteban/Challenge
-      run: dotnet restore
+      run: |
+        solution_file=$(find . -name "*.sln" -type f)
+        if [ -z "$solution_file" ]; then
+          echo "No solution file found"
+          exit 1
+        else
+          echo "Found solution file at: $solution_file"
+          dotnet restore "$solution_file"
+        fi
       
     - name: Build
-      working-directory: ./PuebaTecnicaBackend405226-Paredes-Esteban/Challenge
-      run: dotnet build --no-restore
+      run: |
+        solution_file=$(find . -name "*.sln" -type f)
+        dotnet build "$solution_file" --no-restore
