@@ -189,11 +189,44 @@ public class BaseResponse<T>
 - La entrega se confimara mediante la creacion de una PR Release a main
 
 ## Instrucciones de Instalación
-El candidato debe proporcionar instrucciones claras para:
-1. Instalación de PostgreSQL local
-2. Ejecución del script de base de datos
-3. Ejecutar la migracion con el enfoque database first utilizando EF con fluent api
-4. Configuración del proyecto 
+## 1. Instalar PostgreSQL
+1. **Descargar** PostgreSQL desde el siguiente enlace: [PostgreSQL Downloads](https://www.postgresql.org/download/)
+2. **Instalar PostgreSQL** siguiendo el asistente de instalación.
+3. Durante la instalación, se abrirá una terminal donde se pedirá indicar el puerto donde escucha PostgreSQL.  
+   - Por defecto, el puerto de PostgreSQL es **5432**.
+4. También se pedirá configurar una contraseña para el usuario.  
+   - El **usuario por defecto** es **postgres**.
+
+## 2. Ejecutar el script de base de datos
+Para administrar PostgreSQL,se puede elegir una de las siguientes herramientas:
+
+- **PgAdmin**: [Descargar PgAdmin](https://www.pgadmin.org/)
+- **Azure Data Studio**: [Descargar Azure Data Studio](https://learn.microsoft.com/en-us/azure-data-studio/download-azure-data-studio?view=sql-server-ver16&tabs=win-install%2Cwin-user-install%2Credhat-install%2Cwindows-uninstall%2Credhat-uninstall)
+- **DataGrip**: [Descargar DataGrip](https://www.jetbrains.com/datagrip/download/#section=windows)
+
+Una vez instalada la herramienta:
+
+1. Conéctarse al motor de base de datos PostgreSQL. Dependiendo de la herramienta seleccionada, es posible que sea necesario instalar un plugin para conectarte a PostgreSQL.
+2. Conéctarse utilizando el servidor **localhost**, el **puerto 5432** o el puerto configurado durante la instalación, y las credenciales del usuario creado (nombre de usuario y contraseña).
+3. Ejecuta el script SQL (`DBScript.Sql` en la carpeta fuente del proyecto) para crear la base de datos y sus respectivas tablas.
+
+## 3. Configurar Entity Framework Core y ejecutar Scaffold-DbContext
+Si hay algún cambio en el modelo, probablemente será necesario ejecutar el siguiente comando desde la consola del administrador de Paquetes NuGet de Visual Studio:
+
+```bash
+Scaffold-DbContext "Host=HOST:PUERTO;Database=DATABASE_NAME;Username=USER_NAME;Password=USER_PASS" Npgsql.EntityFrameworkCore.PostgreSQL -OutputDir Models
+Donde Host es el Host de nuestro DBMS, por defecto localhost; PUERTO: el puerto que configuramos previamente, por defecto es 5432.
+USER_NAME y USER_PASS son el usuario y contraseña creados previamente.
+
+## 4. Configurar el proyecto (cadena de conexión, DbContext, etc.)
+1. Antes de ejecutar el proyecto, dirígete al archivo `appsettings.json` y modifica la cadena de conexión llamada `ChallengeConnectionString` con los siguientes parámetros:
+
+```json
+"ChallengeConnectionString": "Host=HOST_IP;Port=PUERTO;Database=DATABASE_NAME;Username=USER_NAME;Password=USER_PASS"
+
+Donde HOST_IP es el ip de la maquina host, debido a que el proyecto se corre desde un Dockerfile, para que se pueda comunicar con la BD de la maquina host y no el localhost del Contenedor de Docker.
+Se puede obtener utilizando el comando ipconfig en Windows, donde indica Dirección IPv4.
+PUERTO es el puerto configurado previamente y los demas campos se rellenan como fue indicado previamente.
 
 ## Extras (No Obligatorios)
 - Docker
